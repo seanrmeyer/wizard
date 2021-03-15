@@ -1,0 +1,54 @@
+---
+title: "Introduction to wizard"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to wizard}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(wizard)
+```
+
+# Wizard: A precision time-series preprocessing framework
+
+Curating features from time-series data is meticulous and time-consuming. How they are defined across time periods can affect model performance. Clinical data contains complexities which cannot be captured using a one-size-fits-all approach. For example, medications and lab values can have a different clinical relevance over the same span of time.
+
+The wizard framework:
+
+* captures varying levels of granularity and history across features
+* introduces intuitive parameters which translate expert knowledge to code
+
+This overview will introduce package functionality and the basic methods for how it works.
+
+# Creating a wiz_frame
+
+A wiz_frame is scaffolding for how the feature set is structured behind the scenes. 
+
+```{r}
+wf = wiz_frame(fixed_data = sample_fixed_data,
+               temporal_data = sample_temporal_data %>% dplyr::filter(id %in% 1:100),
+               fixed_id = 'id',
+               fixed_start = 'admit_time',
+               fixed_end = 'dc_time',
+               temporal_id = 'id',
+               temporal_time = 'time',
+               temporal_variable = 'variable',
+               temporal_category = 'category',
+               temporal_value = 'value',
+               step = hours(6),
+               max_length = days(7), # optional parameter to limit to first 7 days of hospitalization
+               output_folder = file.path(tempdir(), 'wizard_dir'),
+               create_folder = TRUE)
+```
+
+
+This stores a copy of fixed data which don't vary over the course of predictions as well as the temporal data which contains the raw timestamped data.
