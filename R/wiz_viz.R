@@ -67,7 +67,9 @@ wiz_viz_lookback = function(wiz_frame, categories = NULL, variables = NULL, grou
     grouping_var = wiz_frame$temporal_category
   } else if (grouping == "variable") {
     grouping_var = wiz_frame$temporal_variable
-  }
+  } else { # default
+    grouping_var = wiz_frame$temporal_variable
+    }
 
   sampled_data %>%
     ggplot(aes(x = sampled_data %>% pull(!!rlang::parse_expr(wiz_frame$temporal_time)),
@@ -152,6 +154,8 @@ wiz_viz_interval = function(wiz_frame, categories = NULL, variables = NULL, grou
   if(grouping == "category") {
     grouping_var = wiz_frame$temporal_category
   } else if (grouping == "variable") {
+    grouping_var = wiz_frame$temporal_variable
+  } else { # default
     grouping_var = wiz_frame$temporal_variable
   }
 
@@ -240,6 +244,8 @@ wiz_viz_stats = function(wiz_frame, categories = NULL, variables = NULL, groupin
   if(grouping == "category") {
     grouping_var = wiz_frame$temporal_category
   } else if (grouping == "variable") {
+    grouping_var = wiz_frame$temporal_variable
+  } else { # default
     grouping_var = wiz_frame$temporal_variable
   }
 
@@ -335,6 +341,8 @@ wiz_viz_ohlc = function(wiz_frame, categories = NULL, variables = NULL, grouping
   if(grouping == "category") {
     grouping_var = wiz_frame$temporal_category
   } else if (grouping == "variable") {
+    grouping_var = wiz_frame$temporal_variable
+  } else { # default
     grouping_var = wiz_frame$temporal_variable
   }
 
