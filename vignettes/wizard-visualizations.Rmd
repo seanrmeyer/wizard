@@ -1,0 +1,107 @@
+---
+title: "Wizard visualizations"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Wizard visualizations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(wizard)
+library(magrittr)
+library(lubridate)
+```
+
+
+# Overview
+
+> Wiz viz is a set of functions designed to be used with a wiz frame built by the wizard package. It is made to supplement use of expert knowledge. These functions can help with rapid prototyping prior to a wizard data transformation which can be time consuming and computationally costly if necessary to repeat.
+
+
+# Wiz_frame
+
+> A Wiz frame is the scaffolding framework for building out the rest of the data structure. Refer to the getting started vignette for the basics on how to choose parameters for building a wiz frame.
+
+> These functions have default options only to ease getting started.
+
+## Option A: Building a wiz frame
+
+```{r}
+wf = wiz_frame(fixed_data = sample_fixed_data,
+               temporal_data = sample_temporal_data %>% dplyr::filter(id %in% 1:100),
+               fixed_id = 'id',
+               fixed_start = 'admit_time',
+               fixed_end = 'dc_time',
+               temporal_id = 'id',
+               temporal_time = 'time',
+               temporal_variable = 'variable',
+               temporal_category = 'category',
+               temporal_value = 'value',
+               step = hours(6),
+               max_length = days(7), # optional parameter to limit to first 7 days of hospitalization
+               output_folder = file.path(tempdir(), 'wizard_dir'),
+               create_folder = TRUE)
+```
+
+## Option B: Importing a wiz frame
+
+> If you have an existing wiz frame you can import it using the standard syntax for reading in an RDS file.
+
+```{r eval=FALSE}
+wf = readRDS(file.path("wiz_frame.rds"))
+```
+
+# Lookback
+
+> 
+
+```{r}
+wf %>% wiz_viz_lookback(grouping = "category",
+                        predictor_type = "rolling",
+                        n_ids = 4)
+```
+
+# Intervals
+
+> Interval is the period of time that subdivides the span of time predictors are included.
+
+```{r}
+wf %>% wiz_viz_interval(grouping = "category", 
+                        variables = "cr", 
+                        predictor_type = "baseline", 
+                        n_ids = 50)
+```
+
+# Statistics
+
+> This can show distribution of values. The more distributed within a break/interval, the more likely information is lost with fewer intervals. It may be useful to only choose one or a few patients to examine local extremes and see of the values behave across breaks (intervals).
+
+```{r}
+wf %>% wiz_viz_stats(categories = "lab", 
+                     grouping = "variable",
+                     predictor_type = "growing", 
+                     n_ids = 1, 
+                     n_breaks = 20)
+```
+
+# Statistics - first, last, min, max
+
+> OHLC charts (open, high, low, close) originate from stock price evaluation. vertical lines represent the range or min/max while the horizontal lines represent the first and last values of that interval. Additionally, figures are coded green when the trend is upward while figures are red if they are downward or non-changing between first and last values within the period. This chart can be useful to evaluate if there is a large swing in values within intervals which would warrant multiple statistical summarizations. Each row is a unique ID in the data set. Again, reducing to just a single patient and adjusting the number of breaks can help identify the volatility of a measurement at the individual level.
+
+```{r}
+wf %>% wiz_viz_ohlc(categories = "lab",
+                    predictor_type = "growing", 
+                    grouping = "variable",
+                    n_ids = 1, 
+                    n_breaks = 10)
+```
+
+
