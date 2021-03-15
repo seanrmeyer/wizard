@@ -1,5 +1,17 @@
-#' Function to add predictors
-#' before fixed_start.
+#' Function to add rolling/sliding timespan predictors
+#'
+#' @param wiz_frame A wiz frame object
+#' @param variables A vector or list of variable names
+#' @param category A vector or list of category names
+#' @param lookback A lubridate instant, length of time in the past to include
+#' @param window A lubridate instant, break/interval to divide lookback
+#' @param stats A list of summary stats
+#' @param impute Last observation carry forward
+#' @param output_file Logical, whether or not to output to file or console
+#' @param log_file Logical, whether or not to write to log
+#' @param check_size_only
+#' @param last_chunk_completed Integer, the previous chunk completed if chunking is used
+#'
 #' @export
 wiz_add_predictors = function(wiz_frame = NULL,
                               variables = NULL,
@@ -88,6 +100,20 @@ wiz_add_predictors = function(wiz_frame = NULL,
 #' Function to add baseline predictors
 #' Offset of hours(1) would mean that everything would be anchored to 1 hour
 #' before fixed_start.
+#'
+#' @param wiz_frame A wiz frame object
+#' @param variables A vector or list of variable names
+#' @param category A vector or list of category names
+#' @param lookback A lubridate instant, length of time in the past to include
+#' @param window A lubridate instant, break/interval to divide lookback
+#' @param offset A lubridate instant, amount of time prior to fixed_start to anchor first prediction
+#' @param stats A list of summary stats
+#' @param impute Last observation carry forward
+#' @param output_file Logical, whether or not to output to file or console
+#' @param log_file Logical, whether or not to write to log
+#' @param check_size_only
+#' @param last_chunk_completed Integer, the previous chunk completed if chunking is used
+#'
 #' @export
 wiz_add_baseline_predictors = function(wiz_frame = NULL,
                                        variables = NULL,
@@ -181,6 +207,16 @@ wiz_add_baseline_predictors = function(wiz_frame = NULL,
 #' Function to add baseline predictors
 #' Offset of hours(1) would mean that everything would be anchored to 1 hour
 #' before fixed_start.
+#'
+#' @param wiz_frame A wiz frame object
+#' @param variables A vector or list of variable names
+#' @param category A vector or list of category names
+#' @param stats A list of summary stats
+#' @param output_file Logical, whether or not to output to file or console
+#' @param log_file Logical, whether or not to write to log
+#' @param check_size_only
+#' @param last_chunk_completed Integer, the previous chunk completed if chunking is used
+#'
 #' @export
 wiz_add_growing_predictors = function(wiz_frame = NULL,
                                        variables = NULL,
