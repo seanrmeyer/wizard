@@ -95,10 +95,10 @@ wiz_viz = function(wiz_frame, categories = NULL, variables = NULL, grouping = NU
 #' @param n_ids number of IDs to include in plot
 #'
 #' @return plot
-#' @import ggplot2 dplyr
+#' @import ggplot2 dplyr ggridges
 #' @export
 #'
-#' @examples wiz_viz_lookback(wiz_frame, categories = "labs", predictor_type = "baseline", )
+#' @examples wiz_viz_lookback(wiz_frame, categories = "labs", predictor_type = "baseline")
 wiz_viz_lookback = function(wiz_frame, categories = NULL, variables = NULL, grouping = "variable", predictor_type = "rolling", n_ids = NULL) {
 
   # identify left and right time limits to include
