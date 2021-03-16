@@ -240,7 +240,7 @@ wiz_viz_interval = function(wiz_frame, categories = NULL, variables = NULL, grou
   if(grouping == "category") {
     grouping_var = wiz_frame$temporal_category
   } else if (grouping == "variable") {
-    grouping_var = wiz_frame$temporal_variable
+    grouping_var = !!rlang::parse_expr(wiz_frame$temporal_variable)
   } else { # default
     grouping_var = wiz_frame$temporal_variable
   }
