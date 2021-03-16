@@ -1,4 +1,90 @@
 
+wiz_viz = function(wiz_frame, categories = NULL, variables = NULL, grouping = NULL, predictor_type = "rolling", id = NULL, n_ids = NULL, plot = 'rugplot') {
+
+  # if an id is provided set n_ids to 1 else if n_ids is null then show all ids
+  if(!is.null(id)) {
+    n_ids = 1
+  } else if (is.null(n_ids)) { # set number of IDs to sample
+      n_ids = wiz_frame$temporal_data %>%
+        pull(!!rlang::parse_expr(wiz_frame$temporal_id)) %>%
+        length()
+    }
+
+  # identify left and right time limits to include
+  if(predictor_type == "baseline") {
+    timespan_min = min(wiz_frame$temporal_data %>% pull(!!rlang::parse_expr(wiz_frame$temporal_time)))
+    # timespan_min = lookback # first prediction minus lookback convert by step_unit
+    timespan_max = 0
+  } else if (predictor_type == "growing") {
+    timespan_min = 0
+    timespan_max = max(wiz_frame$temporal_data %>%
+                         pull(!!rlang::parse_expr(wiz_frame$temporal_time)))
+  } else { # default
+    timespan_min = min(wiz_frame$temporal_data %>%
+                         pull(!!rlang::parse_expr(wiz_frame$temporal_time)))
+    timespan_max = max(wiz_frame$temporal_data %>%
+                         pull(!!rlang::parse_expr(wiz_frame$temporal_time)))
+  }
+
+  sampled_data = wiz_frame$temporal_data %>%
+    filter_if(!is.null(id), !!rlang::parse_expr(wiz_frame$temporal_id) == id) %>%
+    select(!!rlang::parse_expr(wiz_frame$temporal_id)) %>%
+    sample_n(n_ids) %>%
+    inner_join(wiz_frame$temporal_data) %>%
+    filter(!!rlang::parse_expr(wiz_frame$temporal_time) >= timespan_min,
+           !!rlang::parse_expr(wiz_frame$temporal_time) <= timespan_max)
+
+
+  if(!is.null(categories)) {
+    sampled_data %>%
+      filter(grepl(categories, !!rlang::parse_expr(wiz_frame$temporal_category)))
+  } else if (!is.null(variables)) {
+    # grouping = "variable"
+    sampled_data %>%
+      filter(grepl(variables, !!rlang::parse_expr(wiz_frame$temporal_variable)))
+  }
+
+  if(grouping == "category") {
+    grouping_var = wiz_frame$temporal_category
+  } else if (grouping == "variable") {
+    grouping_var = wiz_frame$temporal_variable
+  } else { # default
+    grouping_var = wiz_frame$temporal_variable
+  }
+
+  if(plot == "rugplot") {
+  sampled_data %>%
+    ggplot(aes(x = sampled_data %>% pull(!!rlang::parse_expr(wiz_frame$temporal_time)),
+               y = !!rlang::parse_expr(grouping_var))) +
+    ggridges::geom_density_ridges(
+      jittered_points = TRUE,
+      position = ggridges::position_points_jitter(width = 0.05, height = 0),
+      point_shape = '|', point_size = 3, point_alpha = 1, alpha = 0.7,
+    ) +
+    # geom_vline(xintercept=as.numeric(seq(from = sampled_data %>% pull(!!rlang::parse_expr(wiz_frame$temporal_time)) %>% min(),
+    #                                                           to = sampled_data %>% pull(!!rlang::parse_expr(wiz_frame$temporal_time)) %>% max(),
+    #                                                           by=wiz_frame$step)),
+    # linetype=4, colour="black") +
+    xlab(paste0("time in ", wf$step_units, "s")) #+
+  # facet_grid(rows = vars(!!rlang::parse_expr(grouping_var)))
+  } else if (plot == "boxplot") {
+    sampled_data %>%
+      ggplot(aes(x = sampled_data %>% pull(!!rlang::parse_expr(wiz_frame$temporal_time)),
+                 y = !!rlang::parse_expr(grouping_var))) +
+      ggridges::geom_density_ridges(
+        jittered_points = TRUE,
+        position = ggridges::position_points_jitter(width = 0.05, height = 0),
+        point_shape = '|', point_size = 3, point_alpha = 1, alpha = 0.7,
+      ) +
+      # geom_vline(xintercept=as.numeric(seq(from = sampled_data %>% pull(!!rlang::parse_expr(wiz_frame$temporal_time)) %>% min(),
+      #                                                           to = sampled_data %>% pull(!!rlang::parse_expr(wiz_frame$temporal_time)) %>% max(),
+      #                                                           by=wiz_frame$step)),
+      # linetype=4, colour="black") +
+      xlab(paste0("time in ", wf$step_units, "s")) #+
+    # facet_grid(rows = vars(!!rlang::parse_expr(grouping_var)))
+  }
+}
+
 #' A visualization to to evaluate lookback timespan in preparation for building wizard predictors
 #'
 #' @param wiz_frame a wiz_frame object

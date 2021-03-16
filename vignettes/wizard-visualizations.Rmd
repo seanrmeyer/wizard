@@ -61,8 +61,6 @@ wf = readRDS(file.path("wiz_frame.rds"))
 
 # Lookback
 
-> 
-
 ```{r}
 wf %>% wiz_viz_lookback(grouping = "category",
                         predictor_type = "rolling",
