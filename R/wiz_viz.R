@@ -226,8 +226,8 @@ wiz_viz_interval = function(wiz_frame, categories = NULL, variables = NULL, grou
       sample_n(n_ids) %>%
       inner_join(wiz_frame$temporal_data) %>%
       filter(!!rlang::parse_expr(wiz_frame$temporal_time) >= timespan_min,
-             !!rlang::parse_expr(wiz_frame$temporal_time) <= timespan_max,
-             grepl(variables, !!rlang::parse_expr(wiz_frame$temporal_variable)))
+             !!rlang::parse_expr(wiz_frame$temporal_time) <= timespan_max)#,
+             # grepl(variables, !!rlang::parse_expr(wiz_frame$temporal_variable)))
   } else { # default
     sampled_data = wiz_frame$temporal_data %>%
       select(!!rlang::parse_expr(wiz_frame$temporal_id)) %>%
@@ -240,7 +240,7 @@ wiz_viz_interval = function(wiz_frame, categories = NULL, variables = NULL, grou
   if(grouping == "category") {
     grouping_var = wiz_frame$temporal_category
   } else if (grouping == "variable") {
-    grouping_var = !!rlang::parse_expr(wiz_frame$temporal_variable)
+    grouping_var = wiz_frame$temporal_variable
   } else { # default
     grouping_var = wiz_frame$temporal_variable
   }
@@ -249,7 +249,7 @@ wiz_viz_interval = function(wiz_frame, categories = NULL, variables = NULL, grou
     filter(!!rlang::parse_expr(wiz_frame$temporal_time) >= timespan_min, !!rlang::parse_expr(wiz_frame$temporal_time) <= timespan_max) %>%
     group_by(!!rlang::parse_expr(wiz_frame$temporal_id), !!rlang::parse_expr(grouping_var)) %>%
     arrange(!!rlang::parse_expr(wiz_frame$temporal_time)) %>%
-    summarize(!!rlang::parse_expr(wiz_frame$temporal_id), !!rlang::parse_expr(grouping), !!rlang::parse_expr(wiz_frame$temporal_time), prev_time = lag(!!rlang::parse_expr(wiz_frame$temporal_time)), interval = !!rlang::parse_expr(wiz_frame$temporal_time) - prev_time, .groups = "keep") %>%
+    summarize(!!rlang::parse_expr(wiz_frame$temporal_id), !!rlang::parse_expr(grouping_var), !!rlang::parse_expr(wiz_frame$temporal_time), prev_time = lag(!!rlang::parse_expr(wiz_frame$temporal_time)), interval = !!rlang::parse_expr(wiz_frame$temporal_time) - prev_time, .groups = "keep") %>%
     filter(!!rlang::parse_expr(wiz_frame$temporal_time) >= timespan_min, !!rlang::parse_expr(wiz_frame$temporal_time) <= timespan_max) %>%
     na.omit() %>%
     ggplot(aes(x = !!rlang::parse_expr(grouping_var), y = interval, fill = !!rlang::parse_expr(grouping_var))) +
